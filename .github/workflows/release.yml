@@ -42,14 +42,16 @@ jobs:
       run: mvn versions:set -DremoveSnapshot
     - name: Cat pom.xml
       run: cat pom.xml
-    - name: Get XML
-      id: getxml
-      uses: mavrosxristoforos/get-xml-info@1.0
+    - uses: fabasoad/yaml-json-xml-converter-action@v1.0.0
+      id: yaml2xml
       with:
-        xml-file: 'pom.xml'
-        xpath: '/project/version'
-    - name: Echo pom version
-      run: echo "Hello ${{ steps.getxml.outputs.info }}"
+        path: 'pom.xml'
+        from: 'xml'
+        to: 'json'
+    - name: Print yaml2xml result
+      run: |
+        echo "${{ steps.yaml2xml.outputs.data }}"
+        echo "${{ steps.yaml2xml.outputs.data.project.version }}"
     - name: Build with Maven
       run: mvn package
     - name: List target
