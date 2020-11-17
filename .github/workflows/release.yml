@@ -48,12 +48,10 @@ jobs:
         path: 'pom.xml'
         from: 'xml'
         to: 'json'
-    - id: data
-      uses: gr2m/get-json-paths-action@v1.x
-      with:
-        json: ${{ steps.yaml2xml.outputs.data }}
-        version: "project.version"
-    - run: "echo version is ${{ steps.data.outputs.version }}"
+    - name: Dump version
+      env:
+        POM_VERSION: ${{ toJson(steps.yaml2xml.outputs.data).project.version }}
+    - run: "echo version is $POM_VERSION"
     - name: Build with Maven
       run: mvn package
     - name: List target
