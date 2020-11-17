@@ -28,17 +28,45 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
-    - name: Checkout code
+    - name: Checkout develop
       uses: actions/checkout@v2
       with:
         ref: develop
+    - name: List files
+      run: ls
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
     - name: Remove snapshpot
       run: mvn versions:set -DremoveSnapshot
+    - name: Cat pom.xml
+      run: cat pom.xml
+    - uses: fabasoad/yaml-json-xml-converter-action@v1.0.0
+      id: yaml2xml
+      with:
+        path: 'pom.xml'
+        from: 'xml'
+        to: 'json'
+    - id: data
+      uses: gr2m/get-json-paths-action@v1.x
+      with:
+        json: ${{ steps.yaml2xml.outputs.data }}
+        version: "project.version"
+    - run: "echo version is ${{ steps.data.outputs.version }}"
     - name: Build with Maven
       run: mvn package
     - name: List target
       run: ls target
+    - name:  Commit and push Release version in pom
+      run: |
+        git commit -m "Prepare new version"
+        git push
+    - name: Checkout main
+      uses: actions/checkout@v2
+      with:
+        ref: main
+    - name:  Merge develop to master
+      run: |
+        git merge develop
+        
