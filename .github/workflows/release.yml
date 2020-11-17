@@ -28,7 +28,7 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}"
-    - name: Checkout code
+    - name: Checkout develop
       uses: actions/checkout@v2
       with:
         ref: develop
@@ -38,7 +38,27 @@ jobs:
         java-version: 1.8
     - name: Remove snapshpot
       run: mvn versions:set -DremoveSnapshot
+    - name: Get XML
+      id: getxml
+      uses: mavrosxristoforos/get-xml-info@1.0
+      with:
+        xml-file: 'pom.xml'
+        xpath: '//version'
+    - name: Echo pom version
+      run: echo "Hello ${{ steps.getxml.outputs.info }}"
     - name: Build with Maven
       run: mvn package
     - name: List target
       run: ls target
+    - name:  Commit and push Release version in pom
+      run: |
+        git commit -m "Prepare new version"
+        git push
+    - name: Checkout main
+      uses: actions/checkout@v2
+      with:
+        ref: main
+    - name:  Merge develop to master
+      run: |
+        git merge develop
+        
