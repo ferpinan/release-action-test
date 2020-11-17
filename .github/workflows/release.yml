@@ -51,7 +51,7 @@ jobs:
     - name: Dump version
       env:
         POM_VERSION: ${{ toJson(steps.yaml2xml.outputs.data).project.version }}
-    - run: "echo version is $POM_VERSION"
+      run: "echo version is $POM_VERSION"
     - name: Build with Maven
       run: mvn package
     - name: List target
